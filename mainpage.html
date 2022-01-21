@@ -16,7 +16,7 @@
             var imageLikeStates = []
 
             axios
-                .get("https://api.nasa.gov/EPIC/api/natural/date/2022-01-18?api_key=SmaOOTEtmvoBufcLU3flwvhwkAOLeghjbKkj977G")
+                .get("https://api.nasa.gov/EPIC/api/natural/date/2022-01-01?api_key=SmaOOTEtmvoBufcLU3flwvhwkAOLeghjbKkj977G")
                 .then(response => {
                     imagelist = response.data;
                     console.log(imagelist);
@@ -39,7 +39,7 @@
                         imageDate.innerHTML = "Date of capture: " + getJustDate(imagelist[i].date)
                         imageDetailDiv.appendChild(imageDate)
                         imageCentroidCoordinates = document.createElement('p')
-                        imageCentroidCoordinates.innerHTML = "Centroid Coordinates: " + imagelist[i].image
+                        imageCentroidCoordinates.innerHTML = "Centroid Coordinates: (" + imagelist[i].centroid_coordinates.lat +", "+ imagelist[i].centroid_coordinates.lon+")"
                         imageDetailDiv.appendChild(imageCentroidCoordinates)
                         imageLikeButton = document.createElement('button')
                         imageLikeButton.innerHTML = "Like"
