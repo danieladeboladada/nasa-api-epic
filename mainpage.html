@@ -1,0 +1,103 @@
+<!doctype html>
+    <head>
+        <title>Daniel Shopify Dev Challenge</title>
+        <h1>EPIC</h1>
+        <p>The EPIC API provides information on the daily imagery collected by DSCOVR's Earth Polychromatic Imaging Camera (EPIC) instrument. 
+            Uniquely positioned at the Earth-Sun Lagrange point, EPIC provides full disc imagery of the Earth and captures unique perspectives of certain astronomical events such as lunar transits 
+            using a 2048x2048 pixel CCD (Charge Coupled Device) detector coupled to a 30-cm aperture Cassegrain telescope.</p>
+    </head>
+
+    <body>
+        <table id="imageinfo"></table>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script>
+            var imagelist = []
+            var api_key = "SmaOOTEtmvoBufcLU3flwvhwkAOLeghjbKkj977G"
+            var imageLikeStates = []
+
+            axios
+                .get("https://api.nasa.gov/EPIC/api/natural/date/2022-01-18?api_key=SmaOOTEtmvoBufcLU3flwvhwkAOLeghjbKkj977G")
+                .then(response => {
+                    imagelist = response.data;
+                    console.log(imagelist);
+                    var imageInfoTable = document.getElementById("imageinfo");
+
+                    for(let i = 0; i < imagelist.length; i++){
+                        tableRow = document.createElement('tr')
+                        tableData = document.createElement('td')
+                        unitImageInfo = document.createElement('img')
+                        unitImageInfo.src = "https://api.nasa.gov/EPIC/archive/natural/" + getJustDate(imagelist[i].date) + "/png/" + imagelist[i].image + ".png?api_key=" + api_key;
+                        unitImageInfo.width = '500'
+                        unitImageInfo.height = '500'
+                        tableData.appendChild(unitImageInfo)
+                        
+                        imageDetailDiv = document.createElement('div');
+                        imageTitle = document.createElement('p')
+                        imageTitle.innerHTML = "Image: " + imagelist[i].image
+                        imageDetailDiv.appendChild(imageTitle)
+                        imageDate = document.createElement('p')
+                        imageDate.innerHTML = "Date of capture: " + getJustDate(imagelist[i].date)
+                        imageDetailDiv.appendChild(imageDate)
+                        imageCentroidCoordinates = document.createElement('p')
+                        imageCentroidCoordinates.innerHTML = "Centroid Coordinates: " + imagelist[i].image
+                        imageDetailDiv.appendChild(imageCentroidCoordinates)
+                        imageLikeButton = document.createElement('button')
+                        imageLikeButton.innerHTML = "Like"
+                        imageLikeButton.setAttribute('id',imagelist[i].identifier);
+                        imageLikeButton.setAttribute('onclick',"changeLikeState(" +imagelist[i].identifier+ ")");
+                        imageDetailDiv.appendChild(imageLikeButton)
+                        tableData.appendChild(imageDetailDiv)
+
+                        obj = {id: imagelist[i].identifier, liked: false}
+                        imageLikeStates.push(obj)
+                        
+                        tableRow.appendChild(tableData)
+                        imageInfoTable.appendChild(tableRow)
+                        imageInfoTable.appendChild(document.createElement('br'))
+                    }
+                })
+                .catch(error => console.error(error));
+
+            function changeLikeState(id){
+
+                for(let i = 0; i < imageLikeStates.length; i++){
+                    if(imageLikeStates[i].id == id){
+                        imageLikeStates[i].liked = !(imageLikeStates[i].liked)
+                        console.log("changed to "+imageLikeStates[i].liked)
+                        if(document.getElementById(id).innerHTML == "Liked"){
+                            document.getElementById(id).innerHTML = "Like"
+                        }
+                        else if(document.getElementById(id).innerHTML == "Like"){
+                            document.getElementById(id).innerHTML = "Liked"
+                        }
+                    }
+                }
+
+            }
+
+            function getJustDate(fullDate){
+                var d = ""
+                var y = ""
+                var m = ""
+                for(let i = 0; i < fullDate.length; i++){
+                    if(i == 10){
+                        break
+                    }
+                    if(i==4 || i == 7){
+                        continue
+                    }
+                    if(i <= 3){
+                        y += fullDate[i]
+                        continue
+                    }
+                    else if(i <= 6){
+                        m += fullDate[i]
+                        continue
+                    }
+                    d += fullDate[i]
+                }
+                return y+"/"+m+"/"+d
+            }
+        </script>
+    </body>
+</html>
