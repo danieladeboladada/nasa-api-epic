@@ -8,7 +8,7 @@
 
     <body>
         <label for="possible-dates">Choose a date:</label>
-        <select name="possible-dates" id="2022-01-01">
+        <select name="possible-dates" id="pos-dates">
             <option value="" selected></option>
             <option value="rigatoni">Rigatoni</option>
             <option value="dave">Dave</option>
@@ -21,9 +21,55 @@
         <script>
             var imagelist = []
             var api_key = "SmaOOTEtmvoBufcLU3flwvhwkAOLeghjbKkj977G"
-            var imageLikeStates = []
+            var imageLikeStates = [] //an array with objects representing each image and its liked state
 
-            axios
+            getPhotos("2020-01-01");
+
+            //change "Like" button state for each photo
+            function changeLikeState(id){
+                for(let i = 0; i < imageLikeStates.length; i++){
+                    if(imageLikeStates[i].id == id){
+                        imageLikeStates[i].liked = !(imageLikeStates[i].liked)
+                        console.log(`changed to ${imageLikeStates[i].liked}`)
+                        if(document.getElementById(id).innerHTML == "Liked"){
+                            document.getElementById(id).innerHTML = "Like"
+                        }
+                        else if(document.getElementById(id).innerHTML == "Like"){
+                            document.getElementById(id).innerHTML = "Liked"
+                        }
+                    }
+                }
+            }
+
+            //get date format to yyyy/mm/dd
+            function getJustDate(fullDate){
+                var d = ""
+                var y = ""
+                var m = ""
+                for(let i = 0; i < fullDate.length; i++){
+                    if(i == 10){
+                        break
+                    }
+                    if(i==4 || i == 7){
+                        continue
+                    }
+                    if(i <= 3){
+                        y += fullDate[i]
+                        continue
+                    }
+                    else if(i <= 6){
+                        m += fullDate[i]
+                        continue
+                    }
+                    d += fullDate[i]
+                }
+                return y+"/"+m+"/"+d
+            }
+
+            //displays all images taken on a certain date
+            function getPhotos(date){
+                console.log(`getting pics for: ${date}`)
+                axios
                 .get("https://api.nasa.gov/EPIC/api/natural/date/2022-01-01?api_key=SmaOOTEtmvoBufcLU3flwvhwkAOLeghjbKkj977G")
                 .then(response => {
                     imagelist = response.data;
@@ -47,7 +93,8 @@
                         imageDate.innerHTML = "Date of capture: " + getJustDate(imagelist[i].date)
                         imageDetailDiv.appendChild(imageDate)
                         imageCentroidCoordinates = document.createElement('p')
-                        imageCentroidCoordinates.innerHTML = "Centroid Coordinates: (" + imagelist[i].centroid_coordinates.lat +", "+ imagelist[i].centroid_coordinates.lon+")"
+                        imageCentroidCoordinates.innerHTML = `Centroid Coordinates: (${imagelist[i].centroid_coordinates.lat}, ${imagelist[i].centroid_coordinates.lon})`
+
                         imageDetailDiv.appendChild(imageCentroidCoordinates)
                         imageLikeButton = document.createElement('button')
                         imageLikeButton.innerHTML = "Like"
@@ -65,46 +112,6 @@
                     }
                 })
                 .catch(error => console.error(error));
-
-            function changeLikeState(id){
-
-                for(let i = 0; i < imageLikeStates.length; i++){
-                    if(imageLikeStates[i].id == id){
-                        imageLikeStates[i].liked = !(imageLikeStates[i].liked)
-                        console.log("changed to "+imageLikeStates[i].liked)
-                        if(document.getElementById(id).innerHTML == "Liked"){
-                            document.getElementById(id).innerHTML = "Like"
-                        }
-                        else if(document.getElementById(id).innerHTML == "Like"){
-                            document.getElementById(id).innerHTML = "Liked"
-                        }
-                    }
-                }
-
-            }
-
-            function getJustDate(fullDate){
-                var d = ""
-                var y = ""
-                var m = ""
-                for(let i = 0; i < fullDate.length; i++){
-                    if(i == 10){
-                        break
-                    }
-                    if(i==4 || i == 7){
-                        continue
-                    }
-                    if(i <= 3){
-                        y += fullDate[i]
-                        continue
-                    }
-                    else if(i <= 6){
-                        m += fullDate[i]
-                        continue
-                    }
-                    d += fullDate[i]
-                }
-                return y+"/"+m+"/"+d
             }
         </script>
     </body>
